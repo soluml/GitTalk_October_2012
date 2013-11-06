@@ -1,0 +1,10 @@
+HTTP Requests - What are they and why they matter.
+              - Perceived Download Time vs. Actual Download Time
+
+
+
+jQuery Selector Performance - Something I'm very interested in learning more about, especially since it's very relevant and accessible and should be something that everyone is practicing.
+
+Alternatives to CSS Sprites - Talking about some of the alternatives to using images in your webpage like: Using new CSS3 Properties for Rounded Corners/Gradients, Icon Fonts and doing Base 64 Encodings.
+
+CDN's, GZipping & Caching Expiration - At the very least, visitors should be using public CDN's like Google Developers for loading their jQuery and jQuery UI or other popular frameworks/libraries.  They should also learn about some server techniques like setting expiry headers and Gzipping.

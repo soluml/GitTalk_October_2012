@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=1024, user-scalable=no">
+	<title>UpFront Wichita - Web Performance Optimization Techniques</title>
+	
+	<!-- Required stylesheet -->
+	<link rel="stylesheet" href="core/deck.core.css">
+	
+	<!-- Extension CSS files go here. Remove or add as needed. -->
+	<link rel="stylesheet" href="extensions/goto/deck.goto.css">
+	<link rel="stylesheet" href="extensions/menu/deck.menu.css">
+	<link rel="stylesheet" href="extensions/navigation/deck.navigation.css">
+	<link rel="stylesheet" href="extensions/status/deck.status.css">
+	<link rel="stylesheet" href="extensions/hash/deck.hash.css">
+	<link rel="stylesheet" href="extensions/scale/deck.scale.css">
+
+	<!-- Style theme. More available in /themes/style/ or create your own. -->
+	<link rel="stylesheet" href="themes/style/web-2.0.css">
+	
+	<!-- Transition theme. More available in /themes/transition/ or create your own. -->
+	<link rel="stylesheet" href="themes/transition/horizontal-slide.css">
+	
+	<!-- Required Modernizr file -->
+	<script src="modernizr.custom.js"></script>
+  <script src="jquery-1.7.2.min.js"></script>
+  <script src="http://code.jquery.com/ui/1.9.0/jquery-ui.js"></script>
+</head>
+<body class="deck-container">
+<!-- Begin slides. Just make elements with a class of slide. -->
+<section class="slide" id="presenter">
+	<h2>Who am I?</h2>
+  <ul>
+    <li>Benjamin Solum - <a href="http://www.soluml.com/">soluml.com</a> or <a href="http://www.twitter.com/soluml">@soluml</a></li>
+    <li>Front-end Web Guy &raquo; I <span style="color:red;">♥</span> JS</li>
+    <li>Lead Web Developer at Riordan Clinic</li>
+    <li>Likes: My wife and two puppies!</li>
+    <li>Dislikes: Sickness, War, IE...</li>
+  </ul>
+</section>
+<section class="slide" id="begin">
+	<h1>Web Performance Optimization Techniques</h1>
+</section>
+<section class="slide" id="httpin">
+	<h1>Reducing HTTP Requests</h1>
+</section>
+<section class="slide" id="http">
+	<h2>Reducing HTTP Requests</h2>
+  <p>HTTP (the internet highway) functions as a request-response protocol.
+    <ul>
+    	<li>Your browser does a DNS lookup to determine where domain.com is.</li>
+    	<li>Your request traverses the wild internets to the server.</li>
+      <li>The server receives the request and figures out which directory/file the request is looking for.</li>
+      <li>The server pulls the file off the disk (if it exists) and readies it to send it back.</li>
+      <li>The server sends the response back with the news; Good (200 OK) or Bad (404 Not Found).</li>
+    </ul>
+  </p>
+</section>
+<section class="slide" id="httpwhat">
+	<h2>Reducing HTTP Requests</h2>
+  <p>HTTP is synchronous: a client issues a request and waits for the corresponding response before anything else is done.</p>
+  <p>Browsers implement various techniques to run http requests in parallel but each request is loaded by the browser in order.</p>
+</section>
+<section class="slide" id="httpwhy">
+	<h2>Reducing HTTP Requests</h2>
+  <p>Are they that big of deal?
+    <ul>
+    	<li>80% of the end-user response time is spent on the front-end. #Convincing</li>
+      <li>Most of this time is tied up in downloading all the components in the page: images, stylesheets, scripts, Flash, etc.</li>
+      <li>Reducing the number of components in turn reduces the number of HTTP requests required to render the page. #Duh</li>
+    </ul>
+  </p>
+</section>
+<section class="slide" id="imagesin">
+	<h1>Reducing Image Requests</h1>
+</section>
+<section class="slide" id="types">
+	<h2>Reducing Image Requests</h2>
+  <p>I've eliminated uneccessary images, how can I continue to reduce requests?
+    <ul>
+	    <li>CSS Properties</li>
+    	<li>CSS Sprites</li>
+      <li>Image Maps</li>
+      <li>Data URI's</li>
+      <li>Icon Fonts</li>
+    </ul>
+  </p>
+</section>
+<section class="slide" id="propertiesin">
+	<h2>Reducing Image Requests</h2>
+	<h1>CSS Properties</h1>
+</section>
+<section class="slide" id="properties">
+	<h2>CSS Properties</h2>
+  <p>New "CSS3" properties are added to the spec all the time (and even some that aren't spec'd). Use them to replace images in your layouts.</p>
+  <p>Always remember to check browser compatibility tables (like caniuse.com) to make sure your target browsers support these properties.</p>
+  <p>Rely on progressive enhancement and tools like Modernizr to implement these properties NOW!</p>
+</section>
+<section class="slide" id="corners">
+	<h2>CSS Properties: Rounded Corners</h2>
+  <p>Because of the "box model", it used to be that rounding corners was not possible in CSS.</p>
+  <p>At minimum, rounded corners required one CSS sprite image or at worst 4 seperate images.</p>
+  <pre><code>/*Set a border...*/
+border: 5px solid #000;
+  
+border-radius: <span>15</span>px;
+-moz-border-radius: <span>15</span>px;
+-webkit-border-radius: <span>15</span>px;</code></pre>
+	<pre class="cornerDemo"><code><div></div></code></pre><br/>
+  <summary>Support: IE9+, Firefox 3.6+, Chrome, Safari 3.1+, iOS Safari 3.2+, Android Browser 2.1+</summary>
+</section>
+<section class="slide" id="gradients">
+	<h2>CSS Properties: Gradients</h2>
+  <p>Gradients were generally images 1px wide by "Element Height" or "Element Width" by 1px high and then stretched on the x/y axis.</p>
+  <p>If the element didn't have fixed dimensions, your only option was to fade into a solid background color.</p>
+</section>
+<section class="slide" id="gradientcode">
+	<h2>CSS Properties: Gradients</h2>
+  <p>With CSS we now have statements for both radial and linear (example below) gradients with as many color stops as needed that dynamically fill their container.</p>
+  <pre><code>background: -moz-linear-gradient(top, #1e5799 0%, #7db9e8 100%);
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#1e5799), color-stop(100%,#7db9e8));
+background: -webkit-linear-gradient(top, #1e5799 0%,#7db9e8 100%);
+background: -o-linear-gradient(top, #1e5799 0%,#7db9e8 100%);
+background: -ms-linear-gradient(top, #1e5799 0%,#7db9e8 100%);
+background: linear-gradient(to bottom, #1e5799 0%,#7db9e8 100%)
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1e5799', endColorstr='#7db9e8',GradientType=0 );</code></pre><br/>
+  <summary>Support: IE6+, Firefox 3.6+, Chrome, Safari 4+, iOS Safari 3.2+, Android Browser 2.1+</summary>
+</section>
+<section class="slide" id="gradientshow">
+	<h2>CSS Properties: Gradients</h2>
+  <pre class="gradientDemo"><code><div></div></code></pre>
+  <pre class="gradientRadialDemo"><code><div></div></code></pre><br/>
+  <summary>Support: IE6+, Firefox 3.6+, Chrome, Safari 4+, iOS Safari 3.2+, Android Browser 2.1+</summary>
+</section>
+<section class="slide" id="shadows">
+	<h2>CSS Properties: Shadows</h2>
+  <p>Box Shadows used transparent pngs and were a fixed size. If the containers dimensions changed, too bad. #BummerDude</p>
+  <p>Inner glows (unless applied as a background image) were often more work than they were worth.</p>
+</section>
+<section class="slide" id="shadowscode">
+	<h2>CSS Properties: Shadows</h2>
+  <p>Box shadow allows you to apply a shadow to the elements container. You can also add an "inner glow" by using the inset property.</p>
+  <p>Multiple shadows can be applied in the same statement. You can also apply box-shadows to pseudo (:before, :after) elements.</p>
+  <pre><code>-moz-box-shadow: 3px 3px 5px 6px #ccc;
+-webkit-box-shadow: 3px 3px 5px 6px #ccc;
+box-shadow: 3px 3px 5px 6px #ccc;</code></pre><br/>
+  <summary>Support: IE9+, Firefox 3.5+, Chrome, Safari 3.1+, iOS Safari 3.2+, Android Browser 2.1+</summary>
+  <p>Text shadow property shadows individual characters. This property also supports multiple shadows.</p>
+  <pre><code>text-shadow: 1px 1px 1px #000;</code></pre><br/>
+  <summary>Support: IE10+, Firefox 3.5+, Chrome, Safari 3.1+, iOS Safari 3.2+, Android Browser 2.1+</summary>
+</section>
+<section class="slide" id="shadowsshow">
+	<h2>CSS Properties: Shadows</h2>
+  <pre class="boxShadowDemo"><code><div></div></code></pre><br/>
+  <summary>Support: IE9+, Firefox 3.5+, Chrome, Safari 3.1+, iOS Safari 3.2+, Android Browser 2.1+</summary><br/>
+  <pre class="textShadowDemo"><code><div>Boom, Shadowy Text</div></code></pre><br/>
+  <summary>Support: IE10+, Firefox 3.5+, Chrome, Safari 3.1+, iOS Safari 3.2+, Android Browser 2.1+</summary>
+</section>
+<section class="slide" id="reflections">
+	<h2>CSS Properties: Reflections</h2>
+  <p>You no longer need a faded duplicate image to create an image reflection.</p>
+  <p>Works on ALL elements, even iframes! #Hawt!</p>
+  <p>Desktop browser support is fairly poor, but there's fantastic support for mobile devices!</p>
+  <pre><code>-webkit-box-reflect: below 2px</code></pre><br/>
+  <summary>Support: Webkit Browsers Only!* Chrome, Safari 4+, iOS Safari 3.2+, Android Browser 2.1+</summary><br/>
+  <summary>*note* Similar effect can be achieved in Firefox 4+ using the -moz-element() background property</summary>
+</section>
+<section class="slide" id="reflectionsshow">
+	<h2>CSS Properties: Reflections</h2>
+  <pre class="reflectionDemo"><code><div></div></code></pre>
+  <pre class="reflectionDemo fade"><code><div></div></code></pre><br/>
+  <summary>Support: Webkit Browsers Only!* Chrome, Safari 4+, iOS Safari 3.2+, Android Browser 2.1+</summary><br/>
+  <summary>*note* Similar effect can be achieved in Firefox 4+ using the -moz-element() background property</summary>
+</section>
+<section class="slide" id="propertiessummary">
+	<h2>CSS Properties: Summary</h2>
+  <ul>
+    <li>ALWAYS use CSS Properties over images unless limited by target browser capabilities.</li>
+    <li>Many bleeding edge properties require the use of vendor prefixes for maximum backwards compatibility(-ms-,-o-,-moz-,-webkit-).</li>
+    <li >Rely on progressive enhancement and tools like Modernizr to implement these properties NOW!</li>
+  </ul>
+</section>
+<section class="slide" id="spritesin">
+	<h2>Reducing Image Requests</h2>
+	<h1>CSS Sprites</h1>
+</section>
+<section class="slide" id="sprites">
+	<h2>CSS Sprites</h2>
+  <p>A CSS Sprite is essentially an image "container" that can be moved and manipulated to give off the appearance of multiple images.</p>
+  <p>Sprites are used all over in computing, even older video games. #MegaMan!!</p>
+  <pre class="spritemm"><code><div data-state="1" class="s1"></div></code></pre><div>=</div> 
+  <pre class="spritemm2"><code><div></div></code></pre>
+  <script>
+  var $mmsprite = $('pre.spritemm div.s1');
+	function changeMM(){
+		var s = parseInt($mmsprite.attr('data-state'),10)+1;
+		if(s>4) s = 1;
+		$mmsprite.attr({'data-state':s,'class':'s'+s});
+	}
+	setInterval(changeMM,800);
+  </script>
+</section>
+<section class="slide" id="spritespro">
+	<h2>CSS Sprites: Benefits and Drawbacks</h2>
+  <p>Benefits</p>
+  <ul>
+    <li>Can potentially eliminate dozen's of file requests from your webpage. #Millions?</li>
+    <li>Eliminates the need for image preloading.</li>
+    <li>Filesize can be smaller than the images seperately.</li>
+    <li>Support is universal.</li>
+  </ul>
+  <p>Drawbacks</p>
+  <ul>
+    <li>Since all images are in one container, you're stuck using only one image type (generally .png).</li>
+    <li>Repeating images (in backgrounds) can be difficult.</li>
+    <li>Images don't always fit into rectangles, so the more images you have, the more likely it is to have wasted whitespace.</li>
+    <li>Unruly, difficult to update and implement. Use a spriting tool (like Compass) to help manage sprites.</li>
+  </ul>
+</section>
+<section class="slide" id="spritescode">
+	<h2>CSS Sprites: Coding</h2>
+  <pre><code>div{ width:120px; height:120px; background: url('sprite.gif') 0 0; }
+div:hover{ background-position:0 -120px; }</code></pre>
+	<pre class="spriteDemo"><code><div></div></code></pre>
+	<h3>or</h3>
+	<pre><code>img { position: absolute; top: 0; left: 0; clip:rect(0 120px 120px 0); }
+img:hover { top:-120px; clip:rect(120px 120px 240px 0); }</code></pre>
+ <pre class="spriteDemo2"><code><img src="arrow.png"></code></pre>
+</section>
+<section class="slide" id="spritessummary">
+	<h2>CSS Sprites: Summary</h2>
+  <ul>
+    <li>One HTTP request will load the entire sprite. #MaximumDamage</li>
+    <li>Generally, any image used to build your layout, that can't be replaced by a CSS property, should be in your main sprite.</li>
+  </ul>
+</section>
+<section class="slide" id="imagemapsin">
+	<h2>Reducing Image Requests</h2>
+	<h1>Image Maps</h1>
+</section>
+<section class="slide" id="imagemaps">
+	<h2>Image Maps</h2>
+  <p>An Image Map is essentially a list of coordinates (in pixels) relating to a specific image, created in order to hyperlink areas of the image to various destinations.</p>
+  <p>They were introduced in HTML 3.2 (Jan. 1997).</p>
+</section>
+<section class="slide" id="imagemapspro">
+	<h2>Image Maps: Benefits and Drawbacks</h2>
+  <p>Benefits</p>
+  <ul>
+    <li>One image with multiple hyperlinks. #Win!!</li>
+    <li>Easy to implement once built! Drop your <code>&lt;map&gt;</code> tag in and your <code>&lt;img&gt;</code> is hotlinked with appropriate alt and title attributes for each <code>&lt;area&gt;</code>. #Accessibility</li>
+    <li>Fantastic browser support! #IECanSuckIt</li>
+  </ul>
+  <p>Drawbacks</p>
+  <ul>
+    <li>Requires &lt;area&gt; tags for each hotlink in the markup which can get verbose and usually goes uncached (unlike CSS).</li>
+    <li>Extremely difficult to build and update. Use of an imaging tool (like Photoshop, Fireworks) is almost a neccessity. </li>
+  </ul>
+</section>
+<section class="slide" id="imagemapscode">
+	<h2>Image Maps: Coding</h2>
+  <pre><code>&lt;map name="ImageMap" id="ImageMap"&gt;
+  &lt;area href="#" shape="rect" coords="450,86,584,188" alt="Big Painting" title="Big Painting"&gt;
+  &lt;area href="#" shape="rect" coords="286,87,376,191" alt="Small Painting" title="Small Painting"&gt;
+  &lt;area href="#" shape="circle" coords="100,141,20" alt="Circle Portrait" title="Circle Portrait"&gt;
+  &lt;area href="#" shape="poly" coords="503,192,511,176,532,176,534,200,553,219,554,234,541,236,525,261,506,261,511,220,515,215" alt="Servant" title="Servant"&gt;
+  &lt;area href="#" shape="rect" coords="12,10,702,500" alt="Default Text" title="Default Text"&gt;
+&lt;/map&gt;
+&lt;img alt="" src="http://upload.wikimedia.org/wikipedia/commons/b/ba/JoshuaReynoldsParty.jpg" width="694" height="493" usemap="#ImageMap"&gt;</code></pre>
+</section>
+<section class="slide" id="imagemapscodeshow">
+	<h2>Image Maps: Coding</h2>
+  <map name="ImageMap" id="ImageMap">
+    <area href="#" shape="rect" coords="450,86,584,188" alt="Big Painting" title="Big Painting">
+    <area href="#" shape="rect" coords="286,87,376,191" alt="Small Painting" title="Small Painting">
+    <area href="#" shape="circle" coords="100,141,20" alt="Circle Portrait" title="Circle Portrait">
+    <area href="#" shape="poly" coords="503,192,511,176,532,176,534,200,553,219,554,234,541,236,525,261,506,261,511,220,515,215" alt="Servant" title="Servant">
+    <area href="#" shape="rect" coords="12,10,702,500" alt="Default Text" title="Default Text">
+  </map>
+  <img alt="" src="http://upload.wikimedia.org/wikipedia/commons/b/ba/JoshuaReynoldsParty.jpg" width="694" height="493" usemap="#ImageMap">
+</section>
+<section class="slide" id="imagemapssummary">
+	<h2>Image Maps: Summary</h2>
+  <ul>
+    <li>If you find yourself slicing up images and linking the individual pieces, consider using an Image Map.</li>
+    <li>If you're using a lot of polygon area's (<code>&lt;area shape="poly"&gt;</code>), consider using <code>&lt;canvas&gt;</code> or <code>&lt;svg&gt;</code>. SVG's are especially awesome for retina displays. #NoRlySVGsRock!</li>
+</section>
+<section class="slide" id="datauriin">
+	<h2>Reducing Image Requests</h2>
+	<h1>Data URI</h1>
+</section>
+<section class="slide" id="datauri">
+	<h2>Data URI</h2>
+  <p>The data URI scheme provides a way to include data in web pages as if they were external resources. This technique allows normally separate elements such as images to be fetched without additional HTTP requests.</p>
+  <p>Base64-encoded data takes about 33% (uncompressed) more space than the original data.</p>
+  <p>Data URIs consume less bandwidth whenever the overhead of encoding the inline content as a data URI is smaller than the HTTP request overhead. #NothingButNet</p>
+</section>
+<section class="slide" id="dataurisupport">
+	<h2>Data URI: Support</h2>
+  <p>Firefox, Opera, and Webkit Based (Chrome, Safari, iOS, etc.) browsers all offer support.</p>
+  <p>Only supported in in IE8+. There is a workaround for IE7 using MHTML. #WorkingInTheDarkAges</p>
+  <p>IE8 has a 32KB limitation and is restricted to these elements (<code>object</code> [images only], <code>img</code>, <code>input type=image</code>, <code>link</code> [data URI must be base64 encoded]) and css properties that accept a URL (like <code>background</code>, <code>list-style</code>, etc.)</p>
+  <p>IE9 does not have 32KB limitation and allowed in broader elements.</p>
+</section>
+<section class="slide" id="datauripro">
+	<h2>Data URI: Benefits and Drawbacks</h2>
+  <p>Benefits</p>
+  <ul>
+    <li>Images without HTTP requests. #DoubleWin!!</li>
+    <li>IE6+ support with MHTML workaround.</li>
+  </ul>
+  <p>Drawbacks</p>
+  <ul>
+    <li>Content must be re-encoded and re-embedded every time a change is made.</li>
+    <li>Referencing the same resource (such as an embedded small image) more than once from the same document results in multiple copies of the embedded resource. #ThinkOfTheChildren</li>
+    <li>Date URI's block synchronous requests, whereas the browser moves on with traditional images.</li>
+    <li>Base64-encoded data URIs are 1/3 larger in size than their binary equivalent. This overhead is reduced to 2-3% if the HTTP server compresses the response using gzip.</li>
+  </ul>
+</section>
+<section class="slide" id="datauricode">
+	<h2>Data URI: Coding</h2>
+  <pre><code>&lt;img src="data:image/png;base64,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" /&gt;</code></pre>
+</section>
+<section class="slide" id="datauricodeshow">
+	<h2>Data URI: Coding</h2>
+  <pre><code><img alt="" src="data:image/png;base64,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" /></code></pre>
+</section>
+<section class="slide" id="dataurimhtml">
+	<h2>Data URI: MHTML for IE6/7</h2>
+  <p>MHTML, short for MIME HTML or "Multipurpose Internet Mail Extensions", is a web page archive format used to combine resources that are typically represented by external links (such as images, Flash animations, etc.) together with HTML code into a single file.</p>
+  <p>Some browsers support the MHTML format, either directly or through third-party extensions, but the process for saving a web page along with its resources as an MHTML file is not standardized. Due to this, a web page saved as an MHTML file using one browser may render differently on another.</p>
+  <p>Don't use this for anything other than filling the lack of IE6/7 support. Prevent modern browsers from downloading MHTML by sticking in a conditional comment.</p>
+  <pre><code>&lt;!--[if lt IE 8]&gt;&lt;link href="ie7.css" type="text/css" /&gt;&lt;![endif]--&gt;</code></pre>
+  
+</section>
+<section class="slide" id="dataurimhtmlcode">
+	<h2>Data URI: MHTML for IE6/7</h2>
+  <pre><code>/*
+Content-Type: multipart/related; boundary="_ANYSEPARATOR_"
+--_ANYSEPARATOR_
+Content-Location:myexample
+Content-Transfer-Encoding:base64
+
+**BASE64 STRING GOES HERE**
+
+--_ANYSEPARATOR_
+*/
+
+#DivImg{
+  width:159px;
+  height:141px;
+  background-image: url(mhtml:http://mydomain.com/myfile.css!myexample);
+}</code></pre>
+</section>
+<section class="slide" id="dataurisummary">
+	<h2>Data URI: Summary</h2>
+  <ul>
+  	<li>It's in your best interest to use it for small images (roughly 5KB or less). #SrslyDon'tUseOnPictures</li>
+    <li>Base64 Images are not a replacement for CSS Sprites. Larger images (&gt;5KB) should be in sheets.</li>
+    <li>If you're using Photoshop to build images, make sure all the meta data is stripped out...that gets encoded too and wastes space!</li>
+    <li>Try to avoid using Base64 Images outside of CSS. Don't make visitors download that string everytime they visit!</li>
+    <li>Make sure you Gzip your CSS (mentioned later); this becomes increasingly important the more Base64 Images you use!</li>
+</section>
+<section class="slide" id="iconin">
+	<h2>Reducing Image Requests</h2>
+	<h1>Icon Fonts</h1>
+</section>
+<section class="slide" id="icon">
+	<h2>Icon Fonts</h2>
+  <p>Icon Fonts combine iconic images with web typography. Instead of traditional Alphanumeric characters representing glyphs, we use simple icons.</p>
+  <p>@font-face was introduced in 2004 (and gained full browser support in 2010).</p>
+  <p>Icon fonts, as a concept, arrived in 2010 but really started gaining support this year.</p>
+</section>
+<section class="slide" id="iconsupport">
+	<h2>Icon Fonts: Support</h2>
+  <p>Any browser that supports @font-face supports Icon Fonts.</p>
+  <p>IE5.5+, Firefox 3.5+, Chrome, Safari 3.2+, Opera 10+, iOS Safari, and Android Browser 2.2+</p>
+</section>
+<section class="slide" id="iconpro">
+	<h2>Icon Fonts: Benefits and Drawbacks</h2>
+  <p>Benefits</p>
+  <ul>
+    <li>One HTTP request to load the font, as many icons as you need. #♥!</li>
+    <li>Unlike sprites, really easy to implement and use!</li>
+    <li>Easily change size, color, opacity, position, anything! All with GREAT browser support.</li>
+    <li>Vector based aka completely resolution independant! Looks great on your new iPads!</li>
+  </ul>
+  <p>Drawbacks</p>
+  <ul>
+    <li>Need to be rendered monochrome or with CSS3 gradients.</li>
+    <li>You're either limited to font's that are available or you have to build your own.</li>
+  </ul>
+</section>
+<section class="slide" id="iconcode">
+	<h2>Icon Fonts: Coding</h2>
+  <div>CSS</div>
+  <pre><code>@font-face{
+  font-family: 'icons';
+  src: url('IconFont.eot?#') format('eot'), 
+       url('IconFont.woff') format('woff'), 
+       url('IconFont.ttf') format('truetype'); 
+}
+[data-icon]:before{
+  font-family: icons;
+  content: attr(data-icon);
+}</code></pre>
+ 	<pre class="iconfontdemo"><code><span aria-hidden="true" data-icon="&#x21dd;"></span></code></pre>
+  <div>HTML</div>
+  <pre><code>&lt;span aria-hidden="true" data-icon="&#x21dd;"&gt;&lt;/span&gt;</code></pre><br/>
+  <pre><code>&lt;span aria-hidden="true" data-icon="&amp;#x21dd;"&gt;&lt;/span&gt;</code></pre>
+</section>
+<section class="slide" id="iconsummary">
+	<h2>Icon Fonts: Summary</h2>
+  <ul>
+    <li>Icon font's are perfect for what they do. Any and all icons should be in one.</li>
+    <li>Any image that's not an icon or simple vector, shouldn't!</li>
+  </ul>
+</section>
+<section class="slide" id="improvehttp">
+	<h1>Improving HTTP Requests</h1>
+</section>
+<section class="slide" id="cachein">
+	<h1>Caching</h1>
+</section>
+<section class="slide" id="cache">
+	<h2>Cache</h2>
+  <p>A web cache is a mechanism for the temporary storage (caching) of web documents, such as HTML pages and images, to reduce bandwidth usage, server load, and perceived lag.</p>
+  <p>A web server uses the Expires header in the HTTP response to tell the client how long a component can be cached. #IsThisMilkBad?</p>
+  <p>There are two parts to this rule:
+  	<ul>
+      <li>For static components: implement "Never expire" policies by setting far future expiry headers.</li>
+      <li>For dynamic components: use an appropriate Cache-Control header to help the browser with conditional requests.</li>
+    </ul>
+  </p>
+</section>
+<section class="slide" id="cacheproblem">
+	<h2>Cache: Code</h2>
+  <p>If you use a far future Expires header you have to change the component's filename whenever the component changes.</p>
+  <b>.htaccess</b><br/>
+  <pre><code>ExpiresActive On
+&lt;FilesMatch "\.(ico|jpg|png|gif|js|css|swf|svg|ttf|otf|eot|woff)$"&gt;
+  ExpiresDefault A29030400
+  Header set Cache-Control "max-age=29030400, public"
+&lt;/FilesMatch&gt;</code></pre><br/>
+	<pre><code>RewriteRule path/to/file/(.+)_(.+)\.css$ path/to/file/$1.css [NC,L]</code></pre>
+</section>
+<section class="slide" id="cachephp">
+	<h2>Cache: Code</h2>
+  <b>PHP</b><br/>
+  <pre><code>function auto_version($path,$ext){
+  $file = $path.'.'.$ext;
+  return $path.'_'.@filemtime($_SERVER['DOCUMENT_ROOT'].$file).'.'.$ext;
+}
+//Prints out: style_123456789.css
+echo auto_version('style','css');</code></pre>
+</section>
+<section class="slide" id="cachesummary">
+	<h2>Cache: Summary</h2>
+  <p>Whenever you can, cache something. This speeds up subsequent visits for visitors.</p>
+  <p>Make sure you use version numbers or some sort of method to change the filename if you have an far future expiry header.</p>
+  <p>Using a query string var (ex. file.css?file=v2) does trigger most browsers to redownload a file, but not all. Sometimes, a query string can even prompt a browser to redownload the file everytime. Use with care. #IWouldntDoIt</p>
+</section>
+<section class="slide" id="gzipin">
+	<h1>Gzip</h1>
+</section>
+<section class="slide" id="gzip">
+	<h2>Gzip</h2>
+  <p>If you can't eliminate the need for an HTTP Request, make the files your request smaller!</p>
+  <p>Gzip is the most popular and effective compression method at this time. It was developed by the GNU project and standardized by RFC 1952. The only other compression format you're likely to see is deflate, but it's less effective and less popular.</p>
+  <div>Starting with HTTP/1.1, web clients indicate support for compression with the Accept-Encoding header in the HTTP request.<br/>
+  <pre><code>Accept-Encoding: gzip, deflate</code></pre></div>
+  <p>Gzipping generally reduces the response size by about 70%. Approximately 90% of today's Internet traffic travels through browsers that claim to support gzip.</p>
+</section>
+<section class="slide" id="gzipshow">
+	<h2>Gzip: File Types</h2>
+  <p>Common file resource types on the web which should be served with HTTP compression:</p>
+  <ul>
+  	<li>Text resources, like HTML, CSS, JavaScript/JSON, and XML.</li>
+    <li>News feeds. Both RSS and Atom feeds are XML documents.</li>
+    <li>SVG images are just XML documents, but they have a different MIME type and file extension.</li>
+    <li>Plain Text like Robots.txt.</li>
+    <li>HTML Components (HTC). HTC files are a proprietary Internet Explorer feature which package markup, style, and code information used for CSS behaviors.</li>
+    <li>ICO files, while an image, aren't natively compressed so we can serve them with Gzip.</li>
+  </ul>
+</section>
+<section class="slide" id="gzipcode">
+	<h2>Gzip: Code</h2>
+  <p>If you use Apache, the module configuring gzip depends on your version: Apache 1.3 uses mod_gzip while Apache 2.x uses mod_deflate.</p>
+	<b>.htaccess</b>
+  <pre><code>&lt;IfModule mod_deflate.c&gt;
+  AddOutputFilterByType DEFLATE text/css text/javascript application/x-javascript application/javascript text/x-component text/html text/richtext image/svg+xml text/plain text/xsd text/xsl text/xml application/json image/x-icon
+&lt;/IfModule&gt;</code></pre>
+</section>
+<section class="slide" id="gzipsummary">
+	<h2>Gzip: Summary</h2>
+  <p>Anything that isn't natively compressed (usually text based) should be served with Gzip.</p>
+  <p>Images (.gif, .png, .jpg) are natively compressed, so serving these with Gzip can actually hurt performance.</p>
+</section>
+<section class="slide" id="cdnin">
+	<h1>Content Delivery Network (CDN)</h1>
+</section>
+<section class="slide" id="cdn">
+	<h2>CDN</h2>
+  <p>A content delivery network or content distribution network (CDN) is a system of computers containing copies of data, placed at various points in a network so as to maximize bandwidth for access to the data from clients throughout the network. A client accesses a copy of the data near to the client, as opposed to all clients accessing the same central server, so as to avoid bottlenecks near that server. (source: Wikipedia)</p>
+  <p>Even if you don't want to pay for a CDN, there are free CDN services available that host popular scripting libraries.</p>
+  <p>You can also benefit from other sites using open CDNs, because files you use might be cached. #Bonus!</p>
+</section>
+<section class="slide" id="cdnexamples">
+	<h2>CDN: Examples</h2>
+  <p><a href="https://developers.google.com/speed/libraries/devguide">Google Hosted Libraries</a><br/><pre><code>&lt;script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"&gt;&lt;/script&gt;</code></pre></p>
+  <p><a href="http://cdnjs.com/">CDNJS</a><br/><pre><code>&lt;script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"&gt;&lt;/script&gt;</code></pre></p>
+  <p><a href="http://aws.amazon.com/cloudfront/">Amazon CloudFront</a></p>
+  <p><a href="http://www.netdna.com/">NetDNA</a></p>
+</section>
+<section class="slide" id="cdnsummary">
+	<h2>CDN: Summary</h2>
+  <p>Don't use a CDN if you have high security restrictions or are working on an intranet application.</p>
+  <p>Make sure the CDN you use supports requesting files over HTTPS.</p>
+  <p>CDNs bring fewer benefits to smaller sites with relatively light traffic. Assuming you don’t require high-bandwidth video or audio files, it may be simpler to keep all your files in one place.</p>
+  <p>The exception to the rule above, is the free and open CDNs. If you need a JavaScript library, strongly consider using a CDN. #OfferYouCantRefuse</p>
+  <div>If you're worried about uptime, you can always host a local copy and setup a fallback:
+  <pre><code>&lt;script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"&gt;&lt;/script&gt;
+&lt;script>window.jQuery || document.write('&lt;script src="js/jquery-1.8.2.min.js"&gt;&lt;\/script&gt;')&lt;/script&gt;</code></pre></div>
+</section>
+<section class="slide" id="resources">
+	<h2>Resources</h1>
+  <ol>
+  	<li><a href="http://developer.yahoo.com/performance/rules.html">Best Practices for Speeding Up Your Web Site</a> (Speed Up Tips)</li>
+  	<li><a href="http://blog.catchpoint.com/2010/09/17/anatomyhttp/">Anatomy of an HTTP Transaction</a> (HTTP Requests)</li>
+    <li><a href="http://www.phpied.com/mhtml-when-you-need-data-uris-in-ie7-and-under/">MHTML – when you need data: URIs in IE7 and under</a> (Data URI's)</li>
+    <li><a href="http://zoompf.com/2012/02/lose-the-wait-http-compression">Lose the Wait: HTTP Compression</a> (Gzip)</li>
+  </ol>
+</section>
+<!-- End slides. -->
+
+
+<!-- Begin extension snippets. Add or remove as needed. -->
+
+<!-- deck.navigation snippet -->
+<a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
+<a href="#" class="deck-next-link" title="Next">&#8594;</a>
+
+<!-- deck.status snippet -->
+<p class="deck-status">
+	<span class="deck-status-current"></span>
+	/
+	<span class="deck-status-total"></span>
+</p>
+
+<!-- deck.goto snippet -->
+<form action="." method="get" class="goto-form">
+	<label for="goto-slide">Go to slide:</label>
+	<input type="text" name="slidenum" id="goto-slide" list="goto-datalist">
+	<datalist id="goto-datalist"></datalist>
+	<input type="submit" value="Go">
+</form>
+
+<!-- deck.hash snippet -->
+<a href="." title="Permalink to this slide" class="deck-permalink">#</a>
+
+<!-- End extension snippets. -->
+
+
+<!-- Required JS files. -->
+<script src="core/deck.core.js"></script>
+
+<!-- Extension JS files. Add or remove as needed. -->
+<script src="core/deck.core.js"></script>
+<script src="extensions/hash/deck.hash.js"></script>
+<script src="extensions/menu/deck.menu.js"></script>
+<script src="extensions/goto/deck.goto.js"></script>
+<script src="extensions/status/deck.status.js"></script>
+<script src="extensions/navigation/deck.navigation.js"></script>
+<script src="extensions/scale/deck.scale.js"></script>
+
+<!-- Initialize the deck. You can put this in an external file if desired. -->
+<script>
+	$(function() {
+		$.deck('.slide');
+	});
+</script>
+</body>
+</html>
